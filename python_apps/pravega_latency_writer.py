@@ -91,6 +91,7 @@ def main():
     parser.add_argument("--video-height", type=int, default=600)
     parser.add_argument("--video-width", type=int, default=800)
     parser.add_argument("--video-fps", type=int, default=30)
+    parser.add_argument("--video-bitrate", type=int, default=5000)
     parser.add_argument("--sleep-seconds", type=float, default=0.0, help="Delay pipeline start by this many seconds")
     args = parser.parse_args()
 
@@ -107,10 +108,10 @@ def main():
     pipeline_description = (
         "videotestsrc name=src is-live=true do-timestamp=true "
         "   ! " + caps + "\n" +
-        "   ! timestampcvt input-timestamp-mode=start-at-current-time \n" +
         "   ! videoconvert \n" +
-        "   ! x264enc tune=zerolatency key-int-max=30 bitrate=5000 \n" +
+        "   ! x264enc tune=zerolatency key-int-max=30 bitrate=" + str(args.video_bitrate) + " \n" +
         "   ! queue max-size-buffers=0 max-size-time=0 max-size-bytes=100000000 \n" +
+        "   ! timestampcvt input-timestamp-mode=start-at-current-time \n" +
         "   ! pravegasink name=sink\n"
     )
     logging.info("Creating pipeline: " + pipeline_description)
