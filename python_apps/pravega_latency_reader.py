@@ -24,7 +24,7 @@ gi.require_version("GLib", "2.0")
 
 # Log file to output latency values.
 latency_log = open("./latency-log.log", "a")
-latency_log.write("absolute_time(s),experiment_time(s),e2e latency(ms)")
+latency_log.write("absolute_time(s),experiment_time(s),e2e latency(ms)\n")
 initial_ime = time.time()
 
 def bus_call(bus, message, loop):
