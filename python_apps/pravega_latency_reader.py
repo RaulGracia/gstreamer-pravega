@@ -25,7 +25,7 @@ gi.require_version("GLib", "2.0")
 # Log file to output latency values.
 latency_log = open("./latency-log.log", "a")
 latency_log.write("absolute_time(s),experiment_time(s),e2e latency(ms)\n")
-initial_ime = time.time()
+initial_time = time.time()
 
 def bus_call(bus, message, loop):
     """Callback for GStreamer bus messages"""
@@ -71,8 +71,8 @@ def add_probe(pipeline, element_name, callback, pad_name="sink", probe_type=Gst.
 def show_metadata_probe(pad, info, user_data):
     """Buffer probe to show metadata in a buffer"""
     gst_buffer = info.get_buffer()
-    time_nanosec = time.time_ns()
     if gst_buffer:
+        time_nanosec = time.time_ns()
         logging.info("show_metadata_probe: %20s:%-8s: pts=%23s, e2e lantecy(ms)=%s, dts=%23s, duration=%23s, size=%8d" % (
             pad.get_parent_element().name,
             pad.name,
@@ -81,7 +81,7 @@ def show_metadata_probe(pad, info, user_data):
             format_clock_time(gst_buffer.dts),
             format_clock_time(gst_buffer.duration),
             gst_buffer.get_size()))
-        latency_log.write(str(time.time()) + "," + str(time.time() - initial_ime) + "," +
+        latency_log.write(str(time.time()) + "," + str(time.time() - initial_time) + "," +
                           str((time_nanosec - (gst_buffer.pts - 37000000000)) / 1000000.) + "\n")
     return Gst.PadProbeReturn.OK
 

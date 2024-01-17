@@ -18,5 +18,7 @@ ROOT_DIR=$(readlink -f $(dirname $0)/..)
 docker run -it --rm \
     --network host \
     --privileged \
+    --user root \
     --log-driver json-file --log-opt max-size=10m --log-opt max-file=2 \
-    pravega/gstreamer:pravega-dev
+    -e ENTRYPOINT='/usr/src/gstreamer-pravega/python_apps/pravega_latency_reader.py --scope test' \
+    pravega/gstreamer:pravega-prod

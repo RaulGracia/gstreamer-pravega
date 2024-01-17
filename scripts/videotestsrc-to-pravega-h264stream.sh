@@ -20,23 +20,25 @@ cargo build
 ls -lh ${ROOT_DIR}/target/debug/*.so
 export GST_PLUGIN_PATH=${ROOT_DIR}/target/debug:${GST_PLUGIN_PATH}
 # log level can be INFO, DEBUG, or LOG (verbose)
-export GST_DEBUG=x264enc:LOG,pravegasink:LOG,basesink:INFO
+export GST_DEBUG=x264enc:LOG,pravegasink:LOG,basesink:INFO,videorate:7
 export RUST_BACKTRACE=1
 export GST_DEBUG_DUMP_DOT_DIR=/tmp/gst-dot/videotestsrc-to-pravega-h264stream
 mkdir -p ${GST_DEBUG_DUMP_DOT_DIR}
 PRAVEGA_STREAM=${PRAVEGA_STREAM:-test1}
-SIZE_SEC=10
-FPS=30
+SIZE_SEC=300
+FPS=5
+NANOS_SINCE_EPOCH_TAI=$(( $(date +%s%N) + 37000000000 ))
 
 gst-launch-1.0 \
 -v \
-videotestsrc name=src is-live=false do-timestamp=true num-buffers=$(($SIZE_SEC*$FPS)) \
-! "video/x-raw,format=YUY2,width=1920,height=1280,framerate=${FPS}/1" \
+videotestsrc name=src do-timestamp=true is-live=true num-buffers=$(($SIZE_SEC*$FPS))   \
+! "video/x-raw,format=YUY2,width=1920,height=1280" \
 ! videoconvert \
 ! clockoverlay "font-desc=Sans 48px" "time-format=%F %T" shaded-background=true \
 ! timeoverlay valignment=bottom "font-desc=Sans 48px" shaded-background=true \
 ! videoconvert \
 ! x264enc key-int-max=${FPS} speed-preset=medium bitrate=2000 \
 ! "video/x-h264,stream-format=byte-stream,profile=main" \
-! pravegasink stream=examples/${PRAVEGA_STREAM} controller=127.0.0.1:9090 seal=false sync=false timestamp-mode=realtime-clock \
+! timestampcvt input-timestamp-mode=start-at-current-time \
+! pravegasink stream=examples/${PRAVEGA_STREAM} controller=127.0.0.1:9090 seal=false sync=false timestamp-mode=tai \
 |& tee /tmp/videotestsrc-to-pravega-h264stream.log

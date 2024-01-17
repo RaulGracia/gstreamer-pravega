@@ -170,7 +170,9 @@ impl TimestampCvt {
                             "Input buffer PTS timestamps will be adjusted by {} nanoseconds to synchronize with the current system time.",
                             state.pts_offset_nanos.unwrap());
                         }
-                    ClockTime::from_nseconds((input_nanos as i128 + state.pts_offset_nanos.unwrap()) as u64)
+                    //ClockTime::from_nseconds((input_nanos as i128 + state.pts_offset_nanos.unwrap()) as u64)
+                    let now = PravegaTimestamp::now();
+                    ClockTime::from_nseconds(now.nanoseconds().unwrap())
                 },
                 InputTimestampMode::StartAtFixedTime => {
                     if state.pts_offset_nanos.is_none() {

@@ -106,7 +106,7 @@ def main():
 
     # Create Pipeline element that will form a connection of other elements.
     pipeline_description = (
-        "videotestsrc name=src is-live=true do-timestamp=true "
+        "videotestsrc name=src is-live=true do-timestamp=true " +
         "   ! " + caps + "\n" +
         "   ! videoconvert \n" +
         "   ! x264enc tune=zerolatency key-int-max=30 bitrate=" + str(args.video_bitrate) + " \n" +
